@@ -1,6 +1,8 @@
 package com.example.myapplication;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -9,6 +11,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.ali.auth.third.ui.context.CallbackContext;
 import com.alibaba.baichuan.android.trade.AlibcTrade;
 import com.alibaba.baichuan.android.trade.AlibcTradeSDK;
 import com.alibaba.baichuan.android.trade.model.AlibcShowParams;
@@ -39,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
 
         mtitle = (TextView)  findViewById(R.id.title);
         //商品id
-        taokeUrl = "539848591176";
+        taokeUrl = "591587602964";
         //商品链接
         //taokeUrl = "https://ai.m.taobao.com/search.html?q=%E7%94%B7%E8%A3%85&pid=mm_48512871_8544703_28814507";
     }
@@ -115,6 +118,8 @@ public class MainActivity extends AppCompatActivity {
             public void onSuccess(int i) {
                 Toast.makeText(MainActivity.this, "登录成功 ",
                         Toast.LENGTH_LONG).show();
+                //获取淘宝用户信息
+                Log.i(TAG, "获取淘宝用户信息: "+AlibcLogin.getInstance().getSession());
             }
 
             @Override
@@ -149,19 +154,48 @@ public class MainActivity extends AppCompatActivity {
          * @return 0标识跳转到手淘打开了, 1标识用h5打开,-1标识出错
          */
 
-        AlibcTaokeParams alibcTaokeParams = new AlibcTaokeParams(); // 若非淘客taokeParams设置为null即可
-        alibcTaokeParams.pid = "mm_48512871_11860020_43616333";
-        alibcTaokeParams.subPid = "mm_48512871_11860020_43616333";
-        alibcTaokeParams.adzoneid = "43616333";
-        alibcTaokeParams.extraParams = new HashMap<>();
-        alibcTaokeParams.extraParams.put("taokeAppkey", "23272848");//一定要是淘宝开放平台appKey
+//        AlibcTaokeParams alibcTaokeParams = new AlibcTaokeParams(); // 若非淘客taokeParams设置为null即可
+//        alibcTaokeParams.pid = "mm_48512871_11860020_43616333";
+//        alibcTaokeParams.subPid = "mm_48512871_11860020_43616333";
+//        alibcTaokeParams.adzoneid = "43616333";
+//        alibcTaokeParams.extraParams = new HashMap<>();
+//        alibcTaokeParams.extraParams.put("taokeAppkey", "23272848");//一定要是淘宝开放平台appKey
 
         //商品ID打开页面
         AlibcBasePage alibcBasePage = new AlibcDetailPage(taokeUrl);
         //商品链接打开页面
 //        AlibcPage alibcBasePage = new AlibcPage(taokeUrl);
+        // 商品详情，支持itemId和openItemId的商品，必填，不允许为null
+//        AlibcBasePage page = new AlibcDetailPage(itemId);
+//
+//// 店铺，店铺id，支持明文id
+//        AlibcBasePage page = new AlibcShopPage(shopId);
+//
+//// 添加购物车，支持itemId和openItemId的商品，必填，不允许为null；
+//        AlibcBasePage page = new AlibcAddCartPage(itemId)
+//
+//// 我的订单
+//// status   默认跳转页面(0:全部, 1:待付款, 2:待发货, 3:待收货, 4:待评价)
+//// allOrder 为 true 显示所有订单，为false只显示通过当前app下单的订单
+//        AlibcBasePage page = new AlibcMyOrdersPage(status, allOrder);
+//
+//// 我的购物车
+//        AlibcBasePage page = new AlibcMyCartsPage();
+//
+//// URL
+//        AlibcBasePage page = new AlibcPage(taokeUrl);
         exParams.put("isv_code", "appisvcode");
-        AlibcTrade.show(this, webView, null, webChromeClient, alibcBasePage, alibcShowParams, alibcTaokeParams, exParams, new DemoTradeCallback());
+        AlibcTrade.show(
+                this,
+                webView,
+                null,
+                webChromeClient,
+                alibcBasePage,
+                alibcShowParams,
+                null,
+                exParams,
+                new DemoTradeCallback()
+        );
     }
 
 
@@ -171,4 +205,11 @@ public class MainActivity extends AppCompatActivity {
         AlibcTradeSDK.destory();
         super.onDestroy();
     }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        CallbackContext.onActivityResult(this, requestCode, resultCode, data);
+    }
+
 }
